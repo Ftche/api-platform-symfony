@@ -2,24 +2,68 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\PostRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use App\Controller\PostPublishController;
+use App\Controller\PostCountController;
 
 /**
  * @ORM\Entity(repositoryClass=PostRepository::class)
  * @ApiResource(
- *     normalizationContext={"groups"={"read:collection"}},
+ *     normalizationContext={"groups"={"read:collection"}, "openapi_definition_name"="Collection"},
  *     denormalizationContext={"groups"={"write:item","write:Post"}},
  *     collectionOperations={
  *     "get",
- *     "post"},
+ *     "post",
+ *     "count_posts"={
+ *         "method"="GET",
+ *         "path"="/posts/allposts",
+ *         "controller"=PostCountController::class,
+ *         "read" = false,"filters" = {},"pagination_enabled"=false,
+ *         "openapi_context"={
+ *              "summary"="Récupére le nombre d'article total",
+ *              "parameters"={
+ *                  {
+ *              "in"="query", "name" ="online",
+ *              "schema"={"type"="integer", "maximum"=1, "minimum"=0},
+ *              "description"="Filtre des articles en ligne"}
+ *              },
+ *          "response"={
+ *                  "200"={"description"="OK", "content"={"application/json"={"schema"={"type"="integer","example"=3}}}}
+ *              },
+ *          }
+ *       }
+ *     },
  *     itemOperations={
- *     "put","delete","get"={"normalization_context"={"groups"={"read:item"}}}
- *     }
+ *     "put",
+ *     "delete",
+ *     "get"={"normalization_context"={"groups"={"read:item", "read:collection", "read:Post"}},
+ *     "openapi_definition_name"="Detail"},
+ *     "publish"={
+ *         "method"="POST",
+ *         "path"="/posts/{id}/publication",
+ *         "controller"=PostPublishController::class,
+ *         "openapi_context"={
+ *              "summary"="Permet de publier un article",
+ *              "requestBody"={
+ *                  "content"={"application/json"={"schema"={}}}
+ *              }
+ *          }
+ *       },
+ *     },
+ *     paginationItemsPerPage=2,
+ *     paginationMaximumItemsPerPage=2,
+ *     paginationClientItemsPerPage=true
  *     )
+ * @ApiFilter(
+ *     SearchFilter::class, properties={"id": "exact", "title": "partial"}
+ * )
  */
 class Post
 {
@@ -67,6 +111,20 @@ class Post
      * @Assert\Valid()
      */
     private $category;
+
+    /**
+     * @ORM\Column(type="boolean", options={"default":"0"})
+     * @Groups({"read:collection"})
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="boolean",
+     *             "description"="En ligne ou pas ?"
+     *         }
+     *     }
+     * )
+     */
+    private $online = false;
 
     public function __construct()
     {
@@ -116,24 +174,24 @@ class Post
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    public function setCreatedAt(\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): self
+    public function setUpdatedAt(\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 
@@ -148,6 +206,18 @@ class Post
     public function setCategory(?Category $category): self
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    public function getOnline(): ?bool
+    {
+        return $this->online;
+    }
+
+    public function setOnline(bool $online): self
+    {
+        $this->online = $online;
 
         return $this;
     }
