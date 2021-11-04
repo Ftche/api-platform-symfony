@@ -90,6 +90,9 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/friendsofphp/proxy-manager-lts" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/api-platform/core" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/web-profiler-bundle" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/brick/math" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/ramsey/collection" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/ramsey/uuid" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

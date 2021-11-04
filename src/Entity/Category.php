@@ -12,7 +12,21 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=CategoryRepository::class)
- * @ApiResource()
+ * @ApiResource(
+ *     collectionOperations={"get", "post"},
+ *     itemOperations={"put",
+ *     "patch",
+ *     "delete",
+ *     "get"={
+ *          "controller"=NotFoundAction::class,
+ *          "openapi_context"={
+ *                  "summary"="Hidden"
+ *              },
+ *          "read"=false,
+ *          "output"=false
+ *        },
+ *     },
+ * )
  */
 class Category
 {
