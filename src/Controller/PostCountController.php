@@ -3,14 +3,12 @@
 namespace App\Controller;
 
 use App\Repository\PostRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 
-class PostCountController
+class PostCountController extends AbstractController
 {
-    /**
-     * @var PostRepository
-     */
-    private PostRepository $postRepository;
+    private $postRepository;
 
     public function __construct(PostRepository $postRepository)
     {
@@ -20,10 +18,10 @@ class PostCountController
     public function __invoke(Request $request): int
     {
         $onlineQuery = $request->get('online');
-        $conditioins = [];
-        if ($conditioins != null) {
-            $conditioins = ['online' => $onlineQuery === '1' ? true : false];
+        $conditions = [];
+        if($onlineQuery != null) {
+            $conditions = ['online' => $onlineQuery === '1' ? true : false];
         }
-        return $this->postRepository->count([$conditioins]);
+        return $this->postRepository->count($conditions);
     }
 }

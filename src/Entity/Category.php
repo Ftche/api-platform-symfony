@@ -2,53 +2,52 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Action\NotFoundAction;
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\CategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\Length;
 
-/**
- * @ORM\Entity(repositoryClass=CategoryRepository::class)
- * @ApiResource(
- *     collectionOperations={"get", "post"},
- *     itemOperations={"put",
- *     "patch",
- *     "delete",
- *     "get"={
- *          "controller"=NotFoundAction::class,
- *          "openapi_context"={
- *                  "summary"="Hidden"
- *              },
- *          "read"=false,
- *          "output"=false
- *        },
- *     },
- * )
- */
-class Category
+#[ORM\Entity(repositoryClass: CategoryRepository::class)]
+#[ApiResource(
+    collectionOperations: ['get','post'],
+    itemOperations: [
+        'put',
+        'patch',
+        'delete',
+        'get' => [
+            'controller' => NotFoundAction::class,
+            'openapi_context' => [
+                'summary' => 'hidden'
+            ],
+            'read' => false,
+            'output' => false
+        ]
+        ],
+)]
+class Category implements UserOwnedInterface
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     * @Groups({"read:Post"})
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    #[Groups(['read:Post'])]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"read:Post","write:Post"})
-     * @Assert\Length(min=3)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
+    #[
+        Groups(['read:Post', 'write:Post']),
+        Length(min: 3)
+    ]
     private $name;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Post::class, mappedBy="category")
-     */
+    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Post::class)]
     private $posts;
+
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'yes')]
+    private $user;
 
     public function __construct()
     {
@@ -73,7 +72,7 @@ class Category
     }
 
     /**
-     * @return Collection|Post[]
+     * @return Collection<int, Post>
      */
     public function getPosts(): Collection
     {
@@ -98,6 +97,18 @@ class Category
                 $post->setCategory(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }

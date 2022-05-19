@@ -19,7 +19,10 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
-            - '../src/Tests/'
+
+    App\Controller\:
+        resource: '../src/Controller/'
+        tags: ['controller.service_arguments']
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
@@ -31,3 +34,15 @@ services:
 
     App\Repository\DependencyRepository:
         arguments: ['%kernel.project_dir%']
+
+    App\Eventlistener\DeserializeListener:
+        tags:
+            - { name: 'kernel.event_listener', event: 'kernel.request', method: 'onKernelRequest', priority: 2 }
+            #- {name: 'kernel.event_listener', event: 'kernel.request', method: 'onKernelRequest', priority: 2}
+        decorates: 'api_platform.listener.request.deserialize'
+        autoconfigure: false
+
+    # App\Serializer\PostContextBuilder:
+    #     decorates: 'api_platform.serializer.context_builder'
+    #     autoconfigure: false
+

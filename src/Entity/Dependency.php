@@ -1,54 +1,58 @@
 <?php
 
 namespace App\Entity;
-use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ApiResource(
- *     paginationEnabled=false,
- *     collectionOperations={"get","post"},
- *     itemOperations={
- *      "get",
- *     "delete",
- *      "put"={
- *             "denormalization_context"={"groups"={"put"}}
- *         }
- *     }
- * )
- */
+#[ApiResource(
+    collectionOperations: [
+        'get',
+        'post'
+    ],
+    itemOperations: [
+        'get',
+        'put' => [
+            'denormalization_context' => [
+                'groups' => ['put:Dependency']
+            ]
+        ],
+        'delete'
+    ],
+    paginationEnabled: false
+)]
 class Dependency
 {
-    /**
-     * @ApiProperty(
-     *     identifier= true
-     * )
-     */
+    #[ApiProperty(
+        identifier: true
+    )]
     private string $uuid;
 
-    /**
-     * @ApiProperty(
-     *     description= "Nom de la dependance"
-     * ),
-     * @Assert\NotBlank()
-     */
+    #[ApiProperty(
+        description: 'Nom de la dépendance'
+    ),
+    Assert\Length(min: 2),
+    Assert\NotBlank()]
     private string $name;
 
-    /**
-     * @ApiProperty(
-     *     description= "version de la dependance",
-     * ),
-     * @Assert\NotBlank()
-     * @Groups("put")
-     */
+    #[ApiProperty(
+        description: 'Version de la dépendance',
+        openapiContext : [
+            'example' => "0.0.*"
+        ]
+    ),
+        Assert\Length(min: 2),
+        Assert\NotBlank(),
+        Groups(['put:Dependency'])
+    ]
     private string $version;
+// @param string $version
 
     /**
+     * @param string $uuid
      * @param string $name
-     * @param string $version
      */
     public function __construct(string $name, string $version)
     {
@@ -88,7 +92,6 @@ class Dependency
     {
         $this->version = $version;
     }
-
 
 
 }

@@ -8,7 +8,8 @@ class PostPublishController
 {
     public function __invoke(Post $data): Post
     {
-        $data->setOnline(true);
-        return $data;
+         $data->setOnline(true);
+         return $data;
     }
+
 }

@@ -1,3 +1,15 @@
-#index:
-#    path: /
-#    controller: App\Controller\DefaultController::index
+controllers:
+    resource: ../src/Controller/
+    type: annotation
+
+kernel:
+    resource: ../src/Kernel.php
+    type: annotation
+
+api_login_check:
+    path: /api/login
+
+api_refresh_token:
+    path: /api/token/refresh
+    methods: ['POST']
+#    controller: gesdinet.jwtrefreshtoken::refresh

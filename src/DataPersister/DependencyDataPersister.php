@@ -8,12 +8,8 @@ use App\Repository\DependencyRepository;
 
 class DependencyDataPersister implements ContextAwareDataPersisterInterface
 {
-
-    private DependencyRepository $repository;
-
-    public function __construct(DependencyRepository $repository)
+    public function __construct(private DependencyRepository $dependencyRepository)
     {
-        $this->repository = $repository;
     }
 
     public function supports($data, array $context = []): bool
@@ -23,11 +19,11 @@ class DependencyDataPersister implements ContextAwareDataPersisterInterface
 
     public function persist($data, array $context = [])
     {
-        $this->repository->persist($data);
+        $this->dependencyRepository->persist($data);
     }
 
     public function remove($data, array $context = [])
     {
-        $this->repository->remove($data);
+        $this->dependencyRepository->remove($data);
     }
 }

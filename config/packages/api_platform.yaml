@@ -1,8 +1,20 @@
 api_platform:
-    show_webby: false
+    # activer ou desactiver l'araignee sur le cote
+    show_webby: true
+#    graphql:
+#        graphiql:
+#            enabled: false
     mapping:
         paths: ['%kernel.project_dir%/src/Entity']
+    formats:
+        json: ['application/json']
+        jsonld: ['application/ld+json']
+        html: ['text/html']
+        multipart:
+            mime_types: [ 'multipart/form-data' ]
     patch_formats:
         json: ['application/merge-patch+json']
     swagger:
         versions: [3]
+    defaults:
+        pagination_client_items_per_page: true
